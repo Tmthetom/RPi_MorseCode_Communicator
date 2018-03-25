@@ -1,3 +1,6 @@
+# MorseCodeWriter - Morse code visualisation on LED (RGB)
+# Timing: https://en.wikipedia.org/wiki/Morse_code#Transmission
+
 import RPi.GPIO as GPIO
 import time
 
