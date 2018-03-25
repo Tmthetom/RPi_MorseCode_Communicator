@@ -1,10 +1,10 @@
-# MorseCodeReader - Reading morse code with photodiode from LED (RGB)
+# MorseCodeReader - Reading morse code with phototransistor from LED (RGB)
 # Timing: https://en.wikipedia.org/wiki/Morse_code#Transmission
 
 import RPi.GPIO as GPIO
 import time
 
-# Photodiode setup
+# Phototransistor setup
 pin = 18
 
 # Settings
