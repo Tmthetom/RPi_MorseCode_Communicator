@@ -114,6 +114,6 @@ try:
 				elif symbol == '-':  # Dash
 					dash()
 
-# BPIO safe exit
+# GPIO safe exit
 except KeyboardInterrupt:
 	GPIO.cleanup()
