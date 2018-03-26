@@ -6,11 +6,11 @@ import time
 
 # LED setup
 red = 18
-green = 23
-blue = 24
+green = 24
+blue = 23
 
 # Settings
-selectedColor = red  # Selected color of LED
+selectedColor = green  # Selected color of LED
 timeUnit = 0.1  # Duration of one time unit [s]
 
 # Morse code dictionary
@@ -75,7 +75,7 @@ GPIO.output(green,GPIO.HIGH)
 GPIO.output(blue,GPIO.HIGH)
 
 # Timing setup (international timing)
-dotLength = timeUnit;  # For how long is LED visible [s]
+dotLength = timeUnit  # For how long is LED visible [s]
 dashLength = dotLength * 3
 breakLength = dotLength
 letterGap = dotLength * 3
