@@ -76,7 +76,7 @@ timeStart = time.time()  # Transmitting begin time [s]
 timeStop = time.time()  # Transmitting end time [s]
 lastState = False  # Last transmitting status (ON, OFF)
 
-# Get transmitting time
+# Get transmission time
 def getTransmissionTime():
 	
 	# Usage of global variables
@@ -101,10 +101,23 @@ def getTransmissionTime():
 		time.sleep(0.01)  # Wait for signal stabilization
 		return timeStop
 
+# Converting time to dot and dash
+def convertTimeToMorseLanguage():
+	
+		if (timeStop == 0) return;  # No new time
+
+# Decode morse code to letters
+def decodeMorseCode():
+
+	# Usage of global variables
+	global timeStop
+	if (timeStop == 0) return;  # No new time
+
 # Main loop
 try:
 	while True:
 		getTransmissionTime()
+		decodeMorseCode()
 
 # BPIO safe exit
 except KeyboardInterrupt:
