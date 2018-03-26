@@ -103,8 +103,8 @@ def getTransmissionTime():
 
 # Converting time to dot and dash
 def convertTimeToMorseLanguage():
-	
-		if (timeStop == 0) return;  # No new time
+
+	if (timeStop == 0) return;  # No new time
 
 # Decode morse code to letters
 def decodeMorseCode():
@@ -117,6 +117,7 @@ def decodeMorseCode():
 try:
 	while True:
 		getTransmissionTime()
+		convertTimeToMorseLanguage()
 		decodeMorseCode()
 
 # BPIO safe exit
