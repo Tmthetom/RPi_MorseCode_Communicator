@@ -71,11 +71,40 @@ breakLength = dotLength
 letterGap = dotLength * 3
 wordGap = dotLength * 7
 
+# Variables for time counting
+timeStart = time.time()  # Transmitting begin time [s]
+timeStop = time.time()  # Transmitting end time [s]
+lastState = False  # Last transmitting status (ON, OFF)
+
+# Get transmitting time
+def getTransmissionTime():
+	
+	# Usage of global variables
+	global timeStart, timeStop, lastState
+
+	# Check for transmitting status changed
+	currentState = GPIO.input(pin)  # Read current status
+	if (currentState != lastState):  # Status changed
+
+		# Transmitting begin
+		if (currentState == True):
+			timeStart = time.time()
+			timeStop = 0
+			print 'Transmitting started'
+
+		# Transmitting end
+		else:
+			timeStop = time.time()
+			print 'Time: ', timeStop - timeStart, ' s'
+
+		lastState = currentState;  # Refresh last status
+		time.sleep(0.01)  # Wait for signal stabilization
+		return timeStop
+
 # Main loop
 try:
 	while True:
-		print(GPIO.input(pin))
-		time.sleep(0.1)
+		getTransmissionTime()
 
 # BPIO safe exit
 except KeyboardInterrupt:
