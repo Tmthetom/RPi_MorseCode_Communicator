@@ -5,7 +5,7 @@ import RPi.GPIO as GPIO
 import time
 
 # Phototransistor setup
-pin = 18
+pin = 25
 
 # Settings
 timeUnit = 0.1  # Duration of one time unit [s]
@@ -65,7 +65,7 @@ GPIO.setmode(GPIO.BCM)  # Refeting pins by Broadcom SOC channel model
 GPIO.setup(pin,GPIO.IN)  # All pins as output
 
 # Timing setup (international timing)
-dotLength = timeUnit;  # For how long is LED visible [s]
+dotLength = timeUnit  # For how long is LED visible [s]
 dashLength = dotLength * 3
 breakLength = dotLength
 letterGap = dotLength * 3
@@ -74,7 +74,8 @@ wordGap = dotLength * 7
 # Main loop
 try:
 	while True:
-		;
+		print(GPIO.input(pin))
+		time.sleep(0.1)
 
 # BPIO safe exit
 except KeyboardInterrupt:
