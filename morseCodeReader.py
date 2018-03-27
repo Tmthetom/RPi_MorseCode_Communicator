@@ -75,14 +75,11 @@ wordGap = dotLength * 7
 # Variables for time counting
 timeStart = time.time()  # Transmitting begin time [s]
 timeStop = time.time()  # Transmitting end time [s]
+pauseTime = time.time()  # Pause between transmittings
 transmitionTime = time.time()  # Transmission time [s]
 lastState = False  # Last transmitting status (ON, OFF)
 
 # Variables for dot dash conversion
-leftDotBoundary = dotLength - precision
-rightDotBoundary = dotLength + precision
-leftDashBoundary = dashLength - precision
-rightDashBoundary = dashLength + precision
 dotDashString = ''
 dot = '.'
 dash = '-'
@@ -91,7 +88,8 @@ dash = '-'
 def getTransmissionTime():
 
 	# Usage of global variables
-	global timeStart, timeStop, lastState, transmitionTime
+	global timeStart, timeStop, lastState
+	global transmitionTime, pauseTime
 
 	# Check for transmitting status changed
 	currentState = GPIO.input(pin)  # Read current status
@@ -99,14 +97,16 @@ def getTransmissionTime():
 
 		# Transmitting begin
 		if currentState == True:
+			pauseTime = time.time() - timeStop
 			timeStart = time.time()
 			timeStop = 0
+			print 'Pause time: ', pauseTime, ' s'
 
 		# Transmitting end
 		else:
 			timeStop = time.time()
+			pauseTime = 0
 			transmitionTime = timeStop - timeStart
-			print 'Time: ', timeStop - timeStart, ' s'
 
 		lastState = currentState  # Refresh last status
 		time.sleep(0.01)  # Wait for signal stabilization
@@ -120,34 +120,56 @@ def timeToDotDash():
 	global transmitionTime, dotDashString
 
 	# Dot
-	if transmitionTime > leftDotBoundary and transmitionTime < rightDotBoundary:
+	if transmitionTime > dotLength - precision and transmitionTime < dotLength + precision:
 		dotDashString += dot
-		print '.'
 
 	# Dash
-	elif transmitionTime > leftDashBoundary and transmitionTime < rightDashBoundary:
+	elif transmitionTime > dashLength - precision and transmitionTime < dashLength + precision:
 		dotDashString += dash
-		print '-'
 
 	else: print 'Not recognized'
 
-# Convert dots and dashes to letters
-def decodeMorseCode():
+# Check for end of word
+def checkWordGap():
 
 	# Usage of global variables
-	global timeStop
+	global dotDashString
+
+	# Recognize regular end of letter between letters
+	if pauseTime > letterGap - precision and pauseTime < letterGap + precision:
+		return True  # End of letter
+
+	# Recognize end of letter on end of word
+	if (time.time() - timeStop) > (letterGap - precision) and (time.time() - timeStop) < (letterGap + precision):
+		return True  # End of letter
+
+	return False
+
+# Convert dots and dashes to letter
+def decodeLetter():
+
+	# Usage of global variables
+	global dotDashString
+
+	for letter, code in CODE.iteritems():
+		if code == dotDashString:
+			print letter
+			dotDashString = ''
 
 # Main loop
 try:
 	while True:
 
+		# Try to decode one letter
+		if checkLetterGap():
+			decodeLetter()  # Convert dots and dashes to letter
+
 		# Check for incomming data
 		newTime = getTransmissionTime()  # Get transmission time
-		if not newTime: continue  # No new time
 
-		# Process incomming data
-		timeToDotDash()  # Convert time to dot and dash
-		decodeMorseCode()  # Convert dots and dashes to letters
+		# If new incomming data
+		if newTime:
+			timeToDotDash()  # Convert time to dot and dash
 
 # BPIO safe exit
 except KeyboardInterrupt:
