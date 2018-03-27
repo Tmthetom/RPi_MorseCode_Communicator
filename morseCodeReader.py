@@ -9,6 +9,7 @@ pin = 25
 
 # Settings
 timeUnit = 0.1  # Duration of one time unit [s]
+precision = 0.02  # Deviation of received time
 
 # Morse code dictionary
 CODE = {"'": '.----.',
@@ -74,51 +75,79 @@ wordGap = dotLength * 7
 # Variables for time counting
 timeStart = time.time()  # Transmitting begin time [s]
 timeStop = time.time()  # Transmitting end time [s]
+transmitionTime = time.time()  # Transmission time [s]
 lastState = False  # Last transmitting status (ON, OFF)
+
+# Variables for dot dash conversion
+leftDotBoundary = dotLength - precision
+rightDotBoundary = dotLength + precision
+leftDashBoundary = dashLength - precision
+rightDashBoundary = dashLength + precision
+dotDashString = ''
+dot = '.'
+dash = '-'
 
 # Get transmission time
 def getTransmissionTime():
-	
+
 	# Usage of global variables
-	global timeStart, timeStop, lastState
+	global timeStart, timeStop, lastState, transmitionTime
 
 	# Check for transmitting status changed
 	currentState = GPIO.input(pin)  # Read current status
-	if (currentState != lastState):  # Status changed
+	if currentState != lastState:  # Status changed
 
 		# Transmitting begin
-		if (currentState == True):
+		if currentState == True:
 			timeStart = time.time()
 			timeStop = 0
-			print 'Transmitting started'
 
 		# Transmitting end
 		else:
 			timeStop = time.time()
+			transmitionTime = timeStop - timeStart
 			print 'Time: ', timeStop - timeStart, ' s'
 
-		lastState = currentState;  # Refresh last status
+		lastState = currentState  # Refresh last status
 		time.sleep(0.01)  # Wait for signal stabilization
-		return timeStop
+		return False if timeStop == 0 else True  # Ternary
+	return False
 
-# Converting time to dot and dash
-def convertTimeToMorseLanguage():
+# Convert time to dot and dash
+def timeToDotDash():
 
-	if (timeStop == 0) return;  # No new time
+	# Usage of global variables
+	global transmitionTime, dotDashString
 
-# Decode morse code to letters
+	# Dot
+	if transmitionTime > leftDotBoundary and transmitionTime < rightDotBoundary:
+		dotDashString += dot
+		print '.'
+
+	# Dash
+	elif transmitionTime > leftDashBoundary and transmitionTime < rightDashBoundary:
+		dotDashString += dash
+		print '-'
+
+	else: print 'Not recognized'
+
+# Convert dots and dashes to letters
 def decodeMorseCode():
 
 	# Usage of global variables
 	global timeStop
-	if (timeStop == 0) return;  # No new time
 
 # Main loop
 try:
 	while True:
-		getTransmissionTime()
-		convertTimeToMorseLanguage()
-		decodeMorseCode()
+
+		# Check for incomming data
+		newTime = getTransmissionTime()  # Get transmission time
+		if not newTime: continue  # No new time
+
+		# Process incomming data
+		timeToDotDash()  # Convert time to dot and dash
+		decodeMorseCode()  # Convert dots and dashes to letters
 
 # BPIO safe exit
 except KeyboardInterrupt:
