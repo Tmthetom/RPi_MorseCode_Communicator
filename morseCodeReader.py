@@ -129,11 +129,8 @@ def timeToDotDash():
 
 	else: print 'Not recognized'
 
-# Check for end of word
-def checkWordGap():
-
-	# Usage of global variables
-	global dotDashString
+# Check for end of letter
+def checkLetterGap():
 
 	# Recognize regular end of letter between letters
 	if pauseTime > letterGap - precision and pauseTime < letterGap + precision:
